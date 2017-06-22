@@ -1,0 +1,17 @@
+## DO NOT MODIFY THIS LINE ##
+<Directory /var/simplesamlphp/>
+	Options Indexes FollowSymLinks
+	AllowOverride None
+	Allow from all
+</Directory>
+
+<VirtualHost *:80>
+	DocumentRoot /var/www/html
+	Alias /simplesaml /var/simplesamlphp/www
+	ServerName SERVERNAMEHERE
+
+	RewriteEngine On
+	RewriteCond %{HTTPS} !on
+	RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
+</VirtualHost>
+

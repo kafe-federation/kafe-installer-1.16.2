@@ -1,0 +1,13 @@
+
+        88 => array('class' => 'core:AttributeMap',
+             'oid2name',
+        ),
+        90 => array(
+            'class' => 'consent:Consent',
+            'store' => 'consent:Cookie',
+            'focus' => 'yes',
+            'checked' => TRUE
+        ),
+        91 => array('class' => 'core:AttributeMap',
+              'name2oid',
+        ),

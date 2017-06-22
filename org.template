@@ -1,0 +1,12 @@
+	
+	'OrganizationName' => array(
+		'en' => 'MYORGNAME',
+	),
+	
+	'OrganizationDisplayName' => array(
+		'en' => 'MYORGDISPLAYNAME',
+	),
+	
+	'OrganizationURL' => array(
+		'en' => 'MYORGURL',
+	),

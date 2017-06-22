@@ -1,0 +1,12 @@
+    'PREFIX-ldap' => array(
+        'ldap:LDAP',
+        'hostname' =>  'ldap://aa-ldap.kreonet.net',
+        'enable_tls' => FALSE,
+        'attributes' => array('uid', 'mail', 'cn', 'displayName', 'o', 'schacHomeOrganization', 'eduPersonAffiliation', 'eduPersonPrincipalName', 'eduPersonScopedAffiliation'),
+        'dnpattern' => 'uid=%username%, ou=users, dc=kreonet, dc=net',
+        'search.enable' => FALSE,
+        'search.base' => 'ou=users, dc=kreonet, dc=net',
+        'search.attributes' => array('uid', 'mail'),
+        'search.username' => NULL,
+        'search.password' => NULL,
+    ),

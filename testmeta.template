@@ -1,0 +1,68 @@
+/* KAFE federation
+ * SP metadata for testssp (https://testssp.kreonet.net/sp/simplesamlphp) 
+ */
+$metadata['https://testssp.kreonet.net/sp/simplesamlphp'] = array (
+  'SingleLogoutService' => 
+  array (
+    0 => 
+    array (
+      'Binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+      'Location' => 'https://testssp.kreonet.net/simplesaml/module.php/saml/sp/saml2-logout.php/default-sp',
+    ),
+  ),
+  'AssertionConsumerService' => 
+  array (
+    0 => 
+    array (
+      'index' => 0,
+      'Binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+      'Location' => 'https://testssp.kreonet.net/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp',
+    ),
+    1 => 
+    array (
+      'index' => 1,
+      'Binding' => 'urn:oasis:names:tc:SAML:1.0:profiles:browser-post',
+      'Location' => 'https://testssp.kreonet.net/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp',
+    ),
+    2 => 
+    array (
+      'index' => 2,
+      'Binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact',
+      'Location' => 'https://testssp.kreonet.net/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp',
+    ),
+    3 => 
+    array (
+      'index' => 3,
+      'Binding' => 'urn:oasis:names:tc:SAML:1.0:profiles:artifact-01',
+      'Location' => 'https://testssp.kreonet.net/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp/artifact',
+    ),
+  ),
+  'attributes' =>
+  array (
+    0 => 'urn:oid:0.9.2342.19200300.100.1.3',
+    1 => 'urn:oid:0.9.2342.19200300.100.1.1',
+    2 => 'urn:oid:2.16.840.1.113730.3.1.241',
+    3 => 'urn:oid:1.3.6.1.4.1.5923.1.1.1.10',
+    4 => 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6',
+    5 => 'urn:oid:2.5.4.10',
+    6 => 'urn:oid:1.3.6.1.4.1.25178.1.2.9',
+    7 => 'urn:oid:1.3.6.1.4.1.5923.1.1.1.1',
+    8 => 'urn:oid:1.3.6.1.4.1.5923.1.1.1.9',
+    9 => 'urn:oid:1.3.6.1.4.1.5923.1.1.1.7',	
+  ),
+  'attributes.NameFormat' => 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri',
+
+  'OrganizationName' => 
+  array (
+    'en' => 'KISTI',
+  ),
+  'OrganizationDisplayName' => 
+  array (
+    'en' => 'KISTI',
+  ),
+  'OrganizationURL' => 
+  array (
+    'en' => 'https://www.kisti.re.kr/',
+  ),
+  'certData' => 'MIIDiDCCAnACCQDclx6nuYFGqTANBgkqhkiG9w0BAQQFADCBhTEOMAwGA1UEChMFS0lTVEkxEzARBgNVBAsTCktSRU9ORVQgQVMxITAfBgkqhkiG9w0BCQEWEmNvcmVlbkBrcmVvbmV0Lm5ldDEQMA4GA1UEBxMHRGFlamVvbjELMAkGA1UEBhMCS1IxHDAaBgNVBAMTE3Rlc3Rzc3Aua3Jlb25ldC5uZXQwHhcNMTYwMjAxMDU1NDUzWhcNMjYwMTMxMDU1NDUzWjCBhTEOMAwGA1UEChMFS0lTVEkxEzARBgNVBAsTCktSRU9ORVQgQVMxITAfBgkqhkiG9w0BCQEWEmNvcmVlbkBrcmVvbmV0Lm5ldDEQMA4GA1UEBxMHRGFlamVvbjELMAkGA1UEBhMCS1IxHDAaBgNVBAMTE3Rlc3Rzc3Aua3Jlb25ldC5uZXQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDkF0cltnsWALIi+bBuPKrU3xj5L6HY6T/SIcPadDF04fiyPZITIUaOXTk9XMLCcXNNBCP3Sedt1WRqrRDHL3r105rPO18pZWmMZR98K1seHyf5Rd4bloGRer1uJxZipt17Gx60Q7r6EM/LNqYfijqugbdCb9vj7/neooLj73aVAQ1/Iv+DtRU6r9jK0ZnQJex4lsXB1xOy6HOLLXtuhHg6vUDTdNIYqR0856uWxf159bEfvaC+71auDjLXbZfSS8uLEMMiAMNsKAOjm15s4YoiFxti4moqYSVCUb/62ARhD5QMZXio9PjECzhU0M07E38YyhGEnEHSrzQmsPFD/5YnAgMBAAEwDQYJKoZIhvcNAQEEBQADggEBAEg9+hzHYbLpGnlWBWDYh7UHDBypXtmgPXweix5N8tic05Tpu1azw0t9jGrfWjnl4/jAo1XABKEqUrys4CJ6LsH+o5sXBfyhU8ST0M0nBhZOO2E2FVnR6bsizWt2VuGE2g6PF7FIMa2rRAeaUbHiTNvlPKrK7ZQkPTJZu+m8OBi8C2X1bsRXGNiSRQMVUvngo+mtLhOYawIkyesPUlJil9JDEcOOhXjdQ9m1MeaSZ862wxqcy+GROghnFHY2j4CHaUxpGV8JMsnO9Q1FRCwFRHNJ3sVlm5ccYROlu3hI+5BhqNC+/Fi4uuxEbigX6TyaThuojwWHhmi82yr20e40C7A=',
+);

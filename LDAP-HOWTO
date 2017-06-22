@@ -1,0 +1,148 @@
+1. remove "xxxx-userpass" array from the config/authsources.php
+
+2. add the following (syntax depends on your LDAP configuration)
+    'aa-ldap' => array(
+        'ldap:LDAP',
+        'hostname' =>  'ldap://aa-ldap.kreonet.net',
+        'enable_tls' => FALSE,
+        'attributes' => array('uid', 'mail', 'cn', 'displayName', 'o', 'schacHomeOrganization', 'eduPersonAffiliation', 'eduPersonPrincipalName', 'eduPersonScopedAffiliation'),
+        'dnpattern' => 'uid=%username%, ou=users, dc=kreonet, dc=net',
+        'search.enable' => FALSE,
+        'search.base' => 'ou=users, dc=kreonet, dc=net',
+        'search.attributes' => array('uid', 'mail'),
+        'search.username' => NULL,
+        'search.password' => NULL,
+    ),
+
+3. open config/config.php and modify "authproc.idp" array (syntax depends on your LDAP configuration)
+   attribute names coming from openLDAP: uid, mail, givenName, sn, cn, displayName, eduPersonAffiliation, o
+   If the names are different from the attribute names used in KAFE, attribute mapping requires.
+   It is required to add an attribute name if the ldap-returned names do not have the attribute.
+   paste and copy never works. MUST change the value of schacHomeOrganization
+   
+
+    'authproc.idp' => array (
+	30 => 'core:LanguageAdaptor',   
+
+	45 => array(
+            'class'         => 'core:StatisticsWithAttribute',
+            'attributename' => 'realm',
+            'type'          => 'saml20-idp-SSO',
+        ),
+
+        51 => array(
+                'class' => 'core:AttributeMap',
+                'o'=> 'organizationName',
+        ),
+
+        52 => array(
+                'class' => 'core:AttributeAdd',
+                'eduPersonPrincipalName' => array(),
+        ),
+
+        53 => array(
+                'class' => 'core:AttributeAdd',
+                'eduPersonScopedAffiliation' => array(),
+        ),
+
+        54 => array(
+                'class' => 'core:AttributeAdd',
+                'eduPersonAffiliation' => array(),
+        ),
+	
+	55 => array(
+		'class' => 'core:AttributeAdd',
+		'schacHomeOrganization' => array('kafe.or.kr'),
+	),
+
+	56 => array(
+		'class' => 'core:AttributeAdd',
+		'eduPersonEntitlement' => array('urn:mace:dir:entitlement:common-lib-terms'),
+	),
+
+        60 => array(
+                'class' => 'core:PHP',
+                'code'  => '
+                        $kafe_eng_affiliation_map = array(
+                                "학생" => array("student","member"),
+                                "직원" => array("staff","member"),
+                                "교수" => array("faculty","member"),
+                                "정교수" => array("faculty","member"),
+                                "조교수" => array("faculty","member"),
+                                "부교수" => array("faculty","member"),
+                                "명예교수" => array("faculty","member"),
+                                "연구원" => array("employee","member"),
+                                "졸업생" => array("alum"),
+                                "학부생" => array("student","member"),
+                                "대학원생" => array("student","member"),
+                                "재학생" => array("student","member"),
+                                "student" => array("student","member"),
+                                "staff" => array("staff","member"),
+                                "faculty" => array("faculty","member"),
+                                "alum" => array("alum"),
+                        );
+
+                        $kafe_array_key = $attributes["eduPersonAffiliation"][0];
+                        if (array_key_exists( $kafe_array_key, $kafe_eng_affiliation_map )) {
+                                $attributes["eduPersonAffiliation"] = $kafe_eng_affiliation_map[$kafe_array_key];
+                        } else {
+                                $attributes["eduPersonAffiliation"] = array("affiliate");
+                        }
+
+                ',
+        ),
+
+        64 => array(
+                'class' => 'core:PHP',
+                'code'  => '
+                            $attributes["eduPersonPrincipalName"] = array($attributes["uid"][0] . $attributes["schacHomeOrganization"][0]);
+
+                ',
+        ),
+
+
+        66 => array(
+                'class' => 'core:PHP',
+                'code' => '
+                          $kafe_epsa_array = array();
+                          $tmp_epsa = $attributes["eduPersonAffiliation"][0] . $attributes["schacHomeOrganization"][0];
+                          array_push($kafe_epsa_array, $tmp_epsa);
+                          $attributes["eduPersonScopedAffiliation"] = $kafe_epsa_array;
+                ',
+        ),
+
+        88 => array(
+                'class' => 'core:TargetedID',
+                'nameId' => TRUE,
+        ),
+
+        89 => array(
+                'class' => 'core:AttributeMap',
+                'name2oid',
+        ),
+
+        90 => 'core:AttributeLimit',
+
+        91 => array(
+                'class' => 'core:AttributeMap',
+                'oid2name',
+        ),
+
+        95 => array(
+            'class' => 'consent:Consent',
+            'store' => 'consent:Cookie',
+            'focus' => 'yes',
+            'checked' => TRUE
+        ),
+
+        96 => array(
+            'class' => 'core:AttributeMap',
+            'name2oid',
+        ),
+
+        99 => 'core:LanguageAdaptor',
+    ),
+
+4. change 'auth' => 'xxxx-userpass' to 'auth' => 'xxxx-ldap' in metadata/saml20-idp-hosted.php. The xxxx is dependent on your configuration
+
+5. remove 'authproc' array from the metadata/saml20-idp-hosted.php

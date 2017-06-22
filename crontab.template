@@ -1,0 +1,4 @@
+# DO NOT modify this line: KAFE_DAILY_PATCH
+02 0 * * * /usr/bin/curl -k --silent "CRONURL?key=CRONKEY&tag=daily" > /dev/null 2>&1
+# DO NOT modify this line: KAFE_HOURLY_PATCH
+01 * * * * /usr/bin/curl -k --silent "CRONURL?key=CRONKEY&tag=hourly" > /dev/null 2>&1

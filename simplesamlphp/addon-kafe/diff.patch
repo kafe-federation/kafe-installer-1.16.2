@@ -1,0 +1,83 @@
+diff -urN simplesamlphp-1.14.14.org/lib/SimpleSAML/IdP.php simplesamlphp-1.14.14/lib/SimpleSAML/IdP.php
+--- simplesamlphp-1.14.14.org/lib/SimpleSAML/IdP.php	2017-05-05 19:55:33.000000000 +0900
++++ simplesamlphp-1.14.14/lib/SimpleSAML/IdP.php	2017-06-22 11:17:38.132894392 +0900
+@@ -462,6 +462,12 @@
+         assert('isset($state["Responder"])');
+ 
+         $idp = SimpleSAML_IdP::getByState($state);
++	$associations = $this->getAssociations();
++	if (empty($associations)) {
++		$session = SimpleSAML_Session::getSessionFromRequest();
++		$auth = $this->config->getString('auth');
++		$session->doLogout($auth);
++	}
+         call_user_func($state['Responder'], $idp, $state);
+         assert('false');
+     }
+@@ -490,11 +496,15 @@
+             $session->deleteData('core:idp-ssotime', $this->id.':'.$state['saml:SPEntityId']);
+         }
+ 
+-        // terminate the local session
+-        $id = SimpleSAML_Auth_State::saveState($state, 'core:Logout:afterbridge');
+-        $returnTo = SimpleSAML_Module::getModuleURL('core/idp/resumelogout.php', array('id' => $id));
++	$logouttype = $this->getConfig()->getString('logouttype');
++	$associations = $this->getAssociations();
++	if (empty($associations) || $logouttype !== 'iframe') {
++            // terminate the local session
++            $id = SimpleSAML_Auth_State::saveState($state, 'core:Logout:afterbridge');
++            $returnTo = SimpleSAML_Module::getModuleURL('core/idp/resumelogout.php', array('id' => $id));
+ 
+-        $this->authSource->logout($returnTo);
++            $this->authSource->logout($returnTo);
++        }
+ 
+         $handler = $this->getLogoutHandler();
+         $handler->startLogout($state, $assocId);
+diff -urN simplesamlphp-1.14.14.org/lib/SimpleSAML/Metadata/SAMLParser.php simplesamlphp-1.14.14/lib/SimpleSAML/Metadata/SAMLParser.php
+--- simplesamlphp-1.14.14.org/lib/SimpleSAML/Metadata/SAMLParser.php	2017-05-05 19:55:33.000000000 +0900
++++ simplesamlphp-1.14.14/lib/SimpleSAML/Metadata/SAMLParser.php	2017-06-22 11:39:49.337838312 +0900
+@@ -180,6 +180,7 @@
+         $this->scopes = $ext['scope'];
+         $this->tags = $ext['tags'];
+         $this->entityAttributes = $ext['EntityAttributes'];
++        $this->registrationInfo = $ext['RegistrationInfo'];
+ 
+         // look over the RoleDescriptors
+         foreach ($entityElement->RoleDescriptor as $child) {
+@@ -444,6 +445,8 @@
+         $ret['entityid'] = $this->entityId;
+         $ret['entityDescriptor'] = $this->entityDescriptor;
+ 
++        $ret['registrationInfo'] = $this->registrationInfo;
++
+         // add organizational metadata
+         if (!empty($this->organizationName)) {
+             $ret['description'] = $this->organizationName;
+@@ -850,6 +853,7 @@
+         $ret['scope'] = $ext['scope'];
+         $ret['tags'] = $ext['tags'];
+         $ret['EntityAttributes'] = $ext['EntityAttributes'];
++        $ret['RegistrationInfo'] = $ext['RegistrationInfo'];
+         $ret['UIInfo'] = $ext['UIInfo'];
+         $ret['DiscoHints'] = $ext['DiscoHints'];
+ 
+@@ -993,6 +997,7 @@
+             'scope'            => array(),
+             'tags'             => array(),
+             'EntityAttributes' => array(),
++	    'RegistrationInfo' => array(),
+             'UIInfo'           => array(),
+             'DiscoHints'       => array(),
+         );
+@@ -1006,6 +1011,10 @@
+ 
+             // Entity Attributes are only allowed at entity level extensions and not at RoleDescriptor level
+             if ($element instanceof SAML2_XML_md_EntityDescriptor) {
++                if ($e instanceof SAML2_XML_mdrpi_RegistrationInfo) {
++                    $ret['RegistrationInfo']['registrationAuthority'] = $e->registrationAuthority;
++                    $ret['RegistrationInfo']['registrationInstant'] = $e->registrationInstant;
++                }
+                 if ($e instanceof SAML2_XML_mdattr_EntityAttributes && !empty($e->children)) {
+                     foreach ($e->children as $attr) {
+                         // only saml:Attribute are currently supported here. The specifications also allows

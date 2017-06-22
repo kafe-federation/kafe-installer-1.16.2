@@ -1,0 +1,172 @@
+<?php
+class sspmod_YOURAUTHSOURCE_Auth_Source_CoreAuth extends sspmod_core_Auth_UserPassBase {
+	/* The database DSN.
+	 * See the documentation for the various database drivers for information about the syntex:
+	 * 	http://www.php.net/manual/en/pdo.drivers.php
+	 */
+	private $dsn;
+	/* the database username & password. */
+	private $username;
+	private $password;
+        private $eAffiliation;
+        private $affiliationMap;
+
+	public function __construct($info, $config) { 
+
+		/* Call the parent constructor first, as required by the interface. */
+		parent::__construct($info, $config);
+
+		if(!is_string($config['dsn'])) {
+			throw new Exception('Missing or invalid dsn option in config.');
+		}
+
+		$this->dsn = $config['dsn'];		
+		
+		if(!is_string($config['username'])) {
+			throw new Exception('Missing or invalid username option in config.');
+		}
+
+		$this->username = $config['username'];
+
+		if(!is_string($config['password'])) {
+			throw new Exception('Missing or invalid username option in config.');
+		}
+
+		$this->password = $config['password'];
+
+                $this->affiliationMap = array(
+                        '학생' => array('student','member'),
+                        '직원' => array('staff','member'),
+                        '교수' => array('faculty','member'),
+                        '정교수' => array('faculty','member'),
+                        '조교수' => array('faculty','member'),
+                        '부교수' => array('faculty','member'),
+			'명예교수' => array('faculty','member'),
+                        '연구원' => array('employee','member'),
+                        '졸업생' => array('alum'),
+                        '학부생' => array('student','member'),
+                        '대학원생' => array('student','member'),
+                        '재학생' => array('student','member'),
+                        'student' => array('student','member'),
+                        'staff' => array('staff','member'),
+                        'faculty' => array('faculty','member'),
+                        'alum' => array('alum'),
+                );
+	}
+
+	private function checkPassword($db_in_pw, $user_in_pw) {
+		return $user_in_pw === $db_in_pw;
+	}
+
+	//ORACLE_START
+	/*
+	protected function login($username, $password) {
+		$db_username='ORACLE_DB_USER';
+		$db_password='ORACLE_DB_PASS';
+
+		$db="(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=ORACLE_IP_ADDR)(PORT=ORACLE_PORT)))(CONNECT_DATA=(SID=ORACLE_SID)))";
+
+		$conn=oci_connect($db_username, $db_password, $db);
+		if(!$conn){
+			$e=oci_error();
+			trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
+		}
+
+		//replace ORACLE_SQL_QUERY with yours
+		//do decryption			
+		$stid=oci_parse($conn, "SELECT ORACLE_FIELD_USERNAME, ORACLE_FIELD_DISPLAYNAME, ORACLE_FIELD_MAIL, ORACLE_FIELD_EPA from ORACLE_TABLENAME WHERE ORACLE_FIELD_USERNAME='$username' AND ORACLE_FIELD_PASSWORD='$password'");
+		oci_execute($stid);
+	
+		if(!$row=oci_fetch_assoc($stid)){
+			SimpleSAML_Logger::warning('MyAuth: Could not find user', var_export($username, TRUE), '.');
+			 throw new SimpleSAML_Error_Error('WRONGUSERPASS');
+		}
+		
+		if (array_key_exists($row['ORACLE_FIELD_EPA'], $this->affiliationMap)) {
+                        $this->eAffiliation = $this->affiliationMap[$row['ORACLE_FIELD_EPA']];
+                } else {
+                        $this->eAffiliation = 'affiliate';
+                }
+
+                $epsAffiliation = array($this->eAffiliation['0']."@ATTR_SCOPED");
+	        $eppName = array($username."@ATTR_SCOPED");
+
+		$attribute=array(
+			'uid' => array($row['ORACLE_FIELD_USERNAME']),
+			'displayName' => array($row['ORACLE_FIELD_DISPLAYNAME']),
+			'mail' => array($row['ORACLE_FIELD_MAIL']),
+			'eduPersonAffiliation' => array($this->eAffiliation),
+		        'eduPersonPrincipalName' => $eppName,
+			'eduPersonScopedAffiliation' => $epsAffiliation,
+			'organizationName' => array('ATTR_ORGNAME'),
+			'schacHomeOrganization' => array('ATTR_SCHACHOME'),
+			  // for future use
+                        'eduPersonEntitlement' => array('ATTR_EPENTITLE'),
+		);
+		oci_free_statement($stid);
+		oci_close($conn);
+		return $attribute;
+	}
+	*/
+	//ORACLE_END
+
+	protected function login($username, $password) {
+		//$db = new PDO("mysql:host=localhost;dbname=user_db_test", "$this->username", "$this->password");
+
+		$db = new PDO($this->dsn, $this->username, $this->password);
+		$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		
+		/*
+		 * Ensure that we are operating with UTF-8 encoding
+   		 * This command is for MySQL. Other database may need different commands.
+                 */
+		$db->exec("SET NAMES 'utf8'");
+
+		/*
+		 * With PDO we use prepared statements. This saves us from having to escape 
+		 * the username in the database query.
+		 */
+		$st = $db->prepare("SELECT username, password, name, email, affi from ex_users where username = '$username'");
+		if(!$st->execute()){
+			throw new Exception('Failed to Query database for the user');
+		}
+
+		$row = $st->fetch(PDO::FETCH_ASSOC);
+		if (!$row) {
+			/* User not found */
+			SimpleSAML_Logger::warning('MyAuth: Could not find user ' . var_export($username, TRUE) . '.');
+			throw new SimpleSAML_Error_Error('WRONGUSERPASS');
+		}
+		if (!$this->checkPassword($row['password'], $password)) {
+			SimpleSAML_Logger::warning('MyAuth: Could not find user ' . var_export($password, TRUE) . '.');
+			throw new SimpleSAML_Error_Error('WRONGUSERPASS');
+		}
+
+      		if (array_key_exists($row['affi'], $this->affiliationMap)) {
+                        $this->eAffiliation = $this->affiliationMap[$row['affi']];
+                } else {
+                        $this->eAffiliation = 'affiliate';
+                }
+		
+		$epsAffiliation = array($this->eAffiliation['0']."@ATTR_SCOPED");		
+		$eppName = array($username."@ATTR_SCOPED");
+
+		$attributes = array(
+			'uid' => array($username),
+			'displayName' 		=> array($row['name']),
+			'mail'			=> array($row['email']),
+	                'eduPersonAffiliation' 	=> $this->eAffiliation,
+			'eduPersonPrincipalName' => $eppName,
+			'eduPersonScopedAffiliation' => $epsAffiliation,
+			'organizationName'	=> array('ATTR_ORGNAME'),
+			'schacHomeOrganization' => array('ATTR_SCHACHOME'),
+			  // for future use
+                        'eduPersonEntitlement' 	=> array('ATTR_EPENTITLE'),
+		);
+
+		return $attributes;		
+	}
+}
+
+?>
+
