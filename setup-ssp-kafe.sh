@@ -268,6 +268,7 @@ fi
 
 unzip master.zip > /dev/null && rm -rf master.zip
 mkdir -p $SSP_PATH && mv simplesamlphp-*/ simplesamlphp && cp -r simplesamlphp/* $SSP_PATH
+rm -rf simplesamlphp
 
 # 보안 컨텍스트 변경
 chcon -R -h -t httpd_sys_content_t $SSP_PATH
