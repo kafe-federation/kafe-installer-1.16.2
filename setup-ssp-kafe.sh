@@ -485,7 +485,7 @@ fi
 
 wget https://github.com/coreen-kafe/consent/archive/master.zip
 unzip master.zip -d $SSP_PATH/modules
-mv $SSP_PATH/modules/consent_master $SSP_PATH/modules/consent
+mv $SSP_PATH/modules/consent-master $SSP_PATH/modules/consent
 
 rm -rf master.zip
 
