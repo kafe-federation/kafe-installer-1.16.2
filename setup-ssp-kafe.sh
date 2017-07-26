@@ -2,8 +2,9 @@
 
 # installtion script for simplesamlphp IdP
 # jiny92@kisti.re.kr (KAFE federation) 2016/1/19
-# updated 2017/06/22 (v 0.43)
+# updated 2017/07/26 (v 0.44)
 # History
+# 0.44: SHA256 signature
 # 0.43: SSP download from KAFE github(bug-fix, read registration authority)
 # 0.42: logrotate configuration
 # 0.41: Bug fixed(Refer im.kreonet.net/wiki)
@@ -200,7 +201,7 @@ echo "[Package setup] it installs required software packages for simpleSAMLphp. 
 The packages include php-date, openssl, mysql, mysql-server, php-mysql, php-mcrypt."
 #read enter
 
-yum -y install php httpd php-common php-pdo php-mbstring php-pear php-mysql php-gd php-date openssl mysql mysql-server mod_ssl php-xml
+#yum -y install php httpd php-common php-pdo php-mbstring php-pear php-mysql php-gd php-date openssl mysql mysql-server mod_ssl php-xml
 
 if [ $BACKEND_DB = "ldap" ] 
 then
@@ -366,7 +367,7 @@ if [ -f ./kafe-member-idp.crt ]; then
 fi
 
 if ! [ -f $SSP_PATH/cert/kafe-member-idp.crt ]; then
-	openssl req -newkey rsa:2048 -new -x509 -days 3652 -nodes -out kafe-member-idp.crt -keyout kafe-member-idp.pem -config ssl.cnf -batch
+	openssl req -newkey rsa:2048 -new -x509 -sha256 -days 3652 -nodes -out kafe-member-idp.crt -keyout kafe-member-idp.pem -config ssl.cnf -batch
 	mv ./kafe-member-idp.* $SSP_PATH/cert
 fi
 
@@ -479,18 +480,15 @@ echo ""
 
 ########################## configuring Consent module
 echo "[Consent setup] it converts the default Consent module into that of KAFE generated"
-touch $SSP_PATH/modules/consent/enable
 
-echo "copying a consent template into consent/www/"
-cp ./getconsent.template $SSP_PATH/modules/consent/www/getconsent.php
+if [ -d $SSP_PATH/modules/consent ]; then
+	rm -rf $SSP_PATH/modules/consent
+fi
 
-echo "overwriting KAFE consent template into modules/consent"
-tar zxvf ./kafeconsent.tar.gz -C $SSP_PATH/modules/consent > /dev/null
-tar zxvf ./kafeconsent_dic.tar.gz -C $SSP_PATH/modules/consent > /dev/null
+wget https://github.com/coreen-kafe/consent/archive/master.zip
+unzip master.zip -d $SSP_PATH/modules
 
-sed -i "s/Privacypolicy for the service/By logging in you agree to the privacy policy of/g" $SSP_PATH/modules/consent/dictionaries/consent.definition.json
-sed -i "s/Privacypolicy for the service/By logging in you agree to the privacy policy of/g" $SSP_PATH/modules/consent/dictionaries/consent.php
-
+rm -rf master.zip
 
 echo ""
 
