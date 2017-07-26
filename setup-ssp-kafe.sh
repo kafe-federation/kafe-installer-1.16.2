@@ -293,8 +293,6 @@ sed -i "s/ADMINMAIL/$SSP_ADMIN_MAIL/g" ssl.cnf
 
 openssl genrsa -out ca.key 2048
 openssl req -new -x509 -nodes -days 365 -key ca.key -out ca.crt -config ssl.cnf -batch
-#openssl req -new -key ca.key -out ca.csr -config ssl.cnf -batch
-#openssl x509 -req -days 365 -in ca.csr -signkey ca.key -out ca.crt
 
 cp ca.crt /etc/pki/tls/certs
 cp ca.key /etc/pki/tls/private/ca.key
@@ -487,6 +485,7 @@ fi
 
 wget https://github.com/coreen-kafe/consent/archive/master.zip
 unzip master.zip -d $SSP_PATH/modules
+mv $SSP_PATH/modules/consent_master $SSP_PATH/modules/consent
 
 rm -rf master.zip
 

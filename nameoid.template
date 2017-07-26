@@ -6,7 +6,9 @@
             'class' => 'consent:Consent',
             'store' => 'consent:Cookie',
             'focus' => 'yes',
-            'checked' => TRUE
+            'checked' => TRUE,
+	    'useRegistrationAuthority' => TRUE,
+	    'useLogo' => FALSE,
         ),
         91 => array('class' => 'core:AttributeMap',
               'name2oid',
