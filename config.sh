@@ -11,9 +11,6 @@ SSP_ADMIN_MAIL=adminemail@yourorg.ac.kr
 # Password of the administrator; the password is used for simpleSAMLphp Web login
 SSP_ADMIN_PASS=yourpasswordhere
 
-# Organization name
-SSP_AUTHSOURCE_PREFIX=post
-
 # Path for simpleSAMLphp
 SSP_PATH="/var/simplesamlphp"
 
@@ -55,7 +52,7 @@ ORACLE_FIELD_EPA=oracle_field_affiliation
 ## Apache configuration
 # The server name should be a domain name. KAFE rejects this identity provider if the 
 # server name is set to an IP address. An IP address would be okay only for testing purpose.
-SERVER_NAME="3.5.5.3"
+SERVER_NAME="134.75.115.33"
 
 # The location of this Identity provider; used for generating a self-signed certification
 SSL_CITYNAME="City"
@@ -80,7 +77,7 @@ MEMBER_ORGURL="http://www.yourorg.ac.kr/"
 MEMBER_IDPURL="https://"$SERVER_NAME"/"
 
 # The BI of your organization; KAFE generates the following two logo images
-MEMBER_ORGIMG="post_logo.gif"
+MEMBER_ORGIMG="kisti_logo.gif"
 
 # The scope of this Identity Provider; the scope is generally a primary domain of the organization
 META_SCOPE="yourorg.ac.kr"

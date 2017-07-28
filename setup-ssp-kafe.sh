@@ -382,47 +382,47 @@ sed -i 's/server.pem/kafe-member-idp.pem/g' $SSP_PATH/metadata/saml20-idp-hosted
 sed -i 's/server.crt/kafe-member-idp.crt/g' $SSP_PATH/metadata/saml20-idp-hosted.php
 
 sed -i "/'auth' => 'example-userpass',/a\	'userid.attribute' => 'uid'," $SSP_PATH/metadata/saml20-idp-hosted.php 
-sed -i "s/'auth' => 'example-userpass'/'auth' => '$SSP_AUTHSOURCE_PREFIX-userpass'/g" $SSP_PATH/metadata/saml20-idp-hosted.php
+sed -i "s/'auth' => 'example-userpass'/'auth' => 'kafe-userpass'/g" $SSP_PATH/metadata/saml20-idp-hosted.php
 
 
 ############## configuring authentication source ###############
 echo "[Authentication-source setup] it enables you to login an Web-based service using a test user DB. \
 Make sure that you have to make further configuration to enable users to login with your organizational user DB."
 
-if grep $SSP_AUTHSOURCE_PREFIX-userpass $SSP_PATH/config/authsources.php > /dev/null; then
-        echo "[Warning] you must delete '"$SSP_AUTHSOURCE_PREFIX"-userpass' array in authsources.php if you want to make this configuration work [Enter]"
+if grep kafe-userpass $SSP_PATH/config/authsources.php > /dev/null; then
+        echo "[Warning] you must delete 'kafe-userpass' array in authsources.php if you want to make this configuration work [Enter]"
 	read enter
 else
-	sed -i "/$config = array(/a\	'$SSP_AUTHSOURCE_PREFIX-userpass' => array(\n		'$SSP_AUTHSOURCE_PREFIX:CoreAuth',\n		'dsn'=>'mysql:host=localhost;dbname=$SQL_DB_NAME',\n		'username'=>'$SQL_DB_USER',\n		'password'=>'$SQL_DB_PASS',\n	)," $SSP_PATH/config/authsources.php
+	sed -i "/$config = array(/a\	'kafe-userpass' => array(\n		'kafe:CoreAuth',\n		'dsn'=>'mysql:host=localhost;dbname=$SQL_DB_NAME',\n		'username'=>'$SQL_DB_USER',\n		'password'=>'$SQL_DB_PASS',\n	)," $SSP_PATH/config/authsources.php
 fi
 
-mkdir -p $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source
-touch $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
-cp ./coreauth.template $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
-sed -i "s/YOURAUTHSOURCE/$SSP_AUTHSOURCE_PREFIX/g" $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
-sed -i "s/ATTR_SCOPED/$ATTRIBUTE_EPSCOPEDAFFILIATION/g" $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
-sed -i "s/ATTR_ORGNAME/$ATTRIBUTE_ORGNAME/g" $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
-sed -i "s/ATTR_SCHACHOME/$ATTRIBUTE_SCHACHOMEORG/g" $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
-sed -i "s/ATTR_EPENTITLE/$ATTRIBUTE_EPENTITLEMENT/g"  $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
+mkdir -p $SSP_PATH/modules/kafe/lib/Auth/Source
+touch $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+cp ./coreauth.template $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+sed -i "s/YOURAUTHSOURCE/kafe/g" $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+sed -i "s/ATTR_SCOPED/$ATTRIBUTE_EPSCOPEDAFFILIATION/g" $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+sed -i "s/ATTR_ORGNAME/$ATTRIBUTE_ORGNAME/g" $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+sed -i "s/ATTR_SCHACHOME/$ATTRIBUTE_SCHACHOMEORG/g" $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+sed -i "s/ATTR_EPENTITLE/$ATTRIBUTE_EPENTITLEMENT/g"  $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
 
 if [ $SQL_TYPE = "oracle" ]; then
-	sed -i "s/ORACLE_DB_USER/$ORACLE_DB_USERNAME/g"  $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
-	sed -i "s/ORACLE_DB_PASS/$ORACLE_DB_PASSWORD/g"  $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
-        sed -i "s/ORACLE_IP_ADDR/$ORACLE_SRV_ADDR/g"  $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
-        sed -i "s/ORACLE_PORT/$ORACLE_SRV_PORT/g"  $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
-        sed -i "s/ORACLE_SID/$ORACLE_SID_NAME/g"  $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
-	sed -i "s/ORACLE_TABLENAME/$ORACLE_TABLENAME/g"  $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
-	sed -i "s/ORACLE_FIELD_USERNAME/$ORACLE_FIELD_USERNAME/g" $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
-        sed -i "s/ORACLE_FIELD_PASSWORD/$ORACLE_FIELD_PASSWORD/g" $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
-	sed -i "s/ORACLE_FIELD_DISPLAYNAME/$ORACLE_FIELD_DISPLAYNAME/g" $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
-	sed -i "s/ORACLE_FIELD_MAIL/$ORACLE_FIELD_MAIL/g" $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
-	sed -i "s/ORACLE_FIELD_EPA/$ORACLE_FIELD_EPA/g" $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
-	sed -i "s/ATTRIBUTE_ORGNAME/$ATTRIBUTE_ORGNAME/g" $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
-	sed -i "s/ATTRIBUTE_SCHACHOMEORG/$ATTRIBUTE_SCHACHOMEORG/g" $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/lib/Auth/Source/CoreAuth.php
+	sed -i "s/ORACLE_DB_USER/$ORACLE_DB_USERNAME/g"  $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+	sed -i "s/ORACLE_DB_PASS/$ORACLE_DB_PASSWORD/g"  $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+        sed -i "s/ORACLE_IP_ADDR/$ORACLE_SRV_ADDR/g"  $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+        sed -i "s/ORACLE_PORT/$ORACLE_SRV_PORT/g"  $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+        sed -i "s/ORACLE_SID/$ORACLE_SID_NAME/g"  $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+	sed -i "s/ORACLE_TABLENAME/$ORACLE_TABLENAME/g"  $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+	sed -i "s/ORACLE_FIELD_USERNAME/$ORACLE_FIELD_USERNAME/g" $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+        sed -i "s/ORACLE_FIELD_PASSWORD/$ORACLE_FIELD_PASSWORD/g" $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+	sed -i "s/ORACLE_FIELD_DISPLAYNAME/$ORACLE_FIELD_DISPLAYNAME/g" $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+	sed -i "s/ORACLE_FIELD_MAIL/$ORACLE_FIELD_MAIL/g" $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+	sed -i "s/ORACLE_FIELD_EPA/$ORACLE_FIELD_EPA/g" $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+	sed -i "s/ATTRIBUTE_ORGNAME/$ATTRIBUTE_ORGNAME/g" $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+	sed -i "s/ATTRIBUTE_SCHACHOMEORG/$ATTRIBUTE_SCHACHOMEORG/g" $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
 fi
 
-touch $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/default-enable
-touch $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/enable
+touch $SSP_PATH/modules/kafe/default-enable
+touch $SSP_PATH/modules/kafe/enable
 
 echo ""
 
@@ -495,7 +495,7 @@ echo ""
 ########################## KAFE theme
 echo "[Theme setup] it overwrites a new KAFE theme. Make sure that your organizational BI(logo) should be placed in "$(pwd)"/images folder."
 
-sed -i "s|https://www.your.org|$MEMBER_IDPURL|g" $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/themes/kafeidp/core/loginuserpass.php
+sed -i "s|https://www.your.org|$MEMBER_IDPURL|g" $SSP_PATH/modules/kafe/themes/coreen/core/loginuserpass.php
 
 if [ -f ./images/$MEMBER_ORGIMG ]; then
 	sed -i "s|images/kreonet_logo.gif|images/$MEMBER_ORGIMG|g" $SSP_PATH/modules/kafe/themes/coreen/core/loginuserpass.php
