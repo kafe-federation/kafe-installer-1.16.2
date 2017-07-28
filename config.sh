@@ -80,8 +80,7 @@ MEMBER_ORGURL="http://www.yourorg.ac.kr/"
 MEMBER_IDPURL="https://"$SERVER_NAME"/"
 
 # The BI of your organization; KAFE generates the following two logo images
-MEMBER_ORGIMG="post.gif"
-MEMBER_CONSENTIMG="login_"$MEMBER_ORGIMG
+MEMBER_ORGIMG="post_logo.gif"
 
 # The scope of this Identity Provider; the scope is generally a primary domain of the organization
 META_SCOPE="yourorg.ac.kr"

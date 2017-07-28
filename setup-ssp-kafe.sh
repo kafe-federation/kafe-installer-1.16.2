@@ -2,8 +2,9 @@
 
 # installtion script for simplesamlphp IdP
 # jiny92@kisti.re.kr (KAFE federation) 2016/1/19
-# updated 2017/07/26 (v 0.44)
+# updated 2017/07/28 (v 0.45)
 # History
+# 0.45: Put on KAFE theme
 # 0.44: SHA256 signature
 # 0.43: SSP download from KAFE github(bug-fix, read registration authority)
 # 0.42: logrotate configuration
@@ -494,45 +495,16 @@ echo ""
 ########################## KAFE theme
 echo "[Theme setup] it overwrites a new KAFE theme. Make sure that your organizational BI(logo) should be placed in "$(pwd)"/images folder."
 
-if ! [ -d $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/themes/www/kafeidp/default/includes ]; then
-	mkdir -p $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/themes/www/kafeidp/default/includes
-fi
-cp $SSP_PATH/templates/includes/*.php $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/themes/www/kafeidp/default/includes
-
-if ! [ -d $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/themes/www/kafeidp/core ]; then
-	mkdir -p $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/themes/www/kafeidp/core
-fi
-
-cp $SSP_PATH/modules/themefeidernd/themes/feidernd/core/loginuserpass.php  $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/themes/www/kafeidp/core
-
-sed -i "s/'theme.use' => 'default'/'theme.use' => '$SSP_AUTHSOURCE_PREFIX:kafeidp'/g" $SSP_PATH/config/config.php
-
-tar xzvf ./sspwww.tar.gz -C $SSP_PATH/www/ > /dev/null
-tar xzvf ./kafetheme.tar.gz -C $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/themes > /dev/null
-
-if [ -d $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/themes/kreonet ]; then
-	mv $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/themes/kreonet $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/themes/kafeidp
-fi
-
-sed -i "s|YOUR_IDP_URL|$MEMBER_IDPURL|g" $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/themes/kafeidp/core/loginuserpass.php
+sed -i "s|https://www.your.org|$MEMBER_IDPURL|g" $SSP_PATH/modules/$SSP_AUTHSOURCE_PREFIX/themes/kafeidp/core/loginuserpass.php
 
 if [ -f ./images/$MEMBER_ORGIMG ]; then
-	sed -i "s|common/kreonet.gif|common/$MEMBER_ORGIMG|g" $SSP_PATH/www/css/korean/common.css
-	cp ./images/$MEMBER_ORGIMG $SSP_PATH/www/images/korean/common
+	sed -i "s|images/kreonet_logo.gif|images/$MEMBER_ORGIMG|g" $SSP_PATH/modules/kafe/themes/coreen/core/loginuserpass.php
+        sed -i "s|images/kreonet_logo.gif|images/$MEMBER_ORGIMG|g" $SSP_PATH/modules/kafe/themes/coreen/core/logout-iframe.php
+	cp ./images/$MEMBER_ORGIMG $SSP_PATH/www/resources/coreen/images/
 else
 	echo "[Warning] Your organizational BI is not found!! place "$MEMBER_ORGIMG" in "$(pwd)"/images first [Enter]"
 	read enter
 fi
-
-if [ -f ./images/$MEMBER_CONSENTIMG ]; then
-	sed -i "s|common/login_kreonet.gif|common/$MEMBER_CONSENTIMG|g"  $SSP_PATH/www/css/korean/common.css
-	cp ./images/$MEMBER_CONSENTIMG  $SSP_PATH/www/images/korean/common
-else
-	echo "[Warning] Your organizational image for Consent is not found!! place "$MEMBER_CONSENTIMG" in "$(pwd)"/images first [Enter]"
-	read enter
-fi
-
-cp ./logout.template  $SSP_PATH/modules/core/templates/logout-iframe.php
 
 echo ""
 
