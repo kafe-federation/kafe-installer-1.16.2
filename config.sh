@@ -12,7 +12,7 @@ SSP_ADMIN_MAIL=adminemail@yourorg.ac.kr
 SSP_ADMIN_PASS=yourpasswordhere
 
 # Path for simpleSAMLphp
-SSP_PATH="/var/simplesamlphp"
+SSP_PATH="/var/simplesamlphp-new"
 
 # This identity-provider server's IP address can be either a public or a private.
 # Currently, the available option is the public only.
@@ -97,6 +97,8 @@ ATTRIBUTE_EPENTITLEMENT="urn:mace:dir:entitlement:common-lib-terms"
 # attributes provided by this Identity Provider; KAFE recommend the use of following user attributes
 KAFE_ATTR="array('uid','surname','givenName','displayName','mail','eduPersonAffiliation','eduPersonEntitlement', 'organizationName','eduPersonPrincipalName','eduPersonScopedAffiliation','schacHomeOrganization', 'schacHomeOrganizationType')"
 
+# add or not research and scholarship category
+KAFE_RS_CATEGORY=yes
 
 # the name of federation; initially, all organizations have to join a test federation
 KAFE_FEDMETANAME="KAFE-testfed"

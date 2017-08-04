@@ -2,8 +2,10 @@
 
 # installtion script for simplesamlphp IdP
 # jiny92@kisti.re.kr (KAFE federation) 2016/1/19
-# updated 2017/07/28 (v 0.45)
+# updated 2017/08/04 (v 0.47)
 # History
+# 0.47: support entitycategories
+# 0.46: minor fix
 # 0.45: Put on KAFE theme
 # 0.44: SHA256 signature
 # 0.43: SSP download from KAFE github(bug-fix, read registration authority)
@@ -371,7 +373,7 @@ if ! [ -f $SSP_PATH/cert/kafe-member-idp.crt ]; then
 fi
 
 # 보안 컨텍스트 변경
-chcon -R -h -t cert_t /var/simplesamlphp/cert/
+chcon -R -h -t cert_t $SSP_PATH/cert/
 
 echo ""
 
@@ -536,6 +538,18 @@ fi
 
 sed -i "s|__DYNAMIC:1__|$META_ENTITYID|g"  $SSP_PATH/metadata/saml20-idp-hosted.php
 
+
+############################ Configuration to support R&D Categories
+echo "[R&S category support] It enables REFEDS R&S categories."
+
+if [ $KAFE_RS_CATEGORY = "yes" ]; then
+    wget https://github.com/coreen-kafe/entitycategories/archive/master.zip
+    unzip master.zip -d $SSP_PATH/modules
+    mv $SSP_PATH/modules/entitycategories-master $SSP_PATH/modules/entitycategories
+    rm -rf master.zip
+
+    sed -i -e "/\/* Add a entitycategories below/r rnscat.template" $SSP_PATH/config/config.php
+fi
 
 ############################ Default SP configuration for testing
 echo "[SP metadata configuration] It sets a default SP (https://testssp.kreonet.net/) metadata."

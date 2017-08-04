@@ -1,0 +1,15 @@
+        
+	48 => array(
+            'class'         => 'entitycategories:EntityCategory',
+            'default'       => true,
+            'map'           => 'name2oid',
+            'http://refeds.org/category/research-and-scholarship'    => array(
+                'displayName',
+                'givenName',
+                'sn',
+                'mail',
+                'eduPersonScopedAffiliation',
+                'eduPersonPrincipalName',
+                'eduPersonTargetedID',
+            ),
+        ),

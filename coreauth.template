@@ -149,7 +149,7 @@ class sspmod_YOURAUTHSOURCE_Auth_Source_CoreAuth extends sspmod_core_Auth_UserPa
                 }
 		
 		$epsAffiliation = array($this->eAffiliation['0']."@ATTR_SCOPED");		
-		$eppName = array($username."@ATTR_SCOPED");
+		$eppName = array(base64_encode(sha1($username))."@ATTR_SCOPED");
 
 		$attributes = array(
 			'uid' => array($username),
