@@ -52,7 +52,7 @@ ORACLE_FIELD_EPA=oracle_field_affiliation
 ## Apache configuration
 # The server name should be a domain name. KAFE rejects this identity provider if the 
 # server name is set to an IP address. An IP address would be okay only for testing purpose.
-SERVER_NAME="3.5.5.3"
+SERVER_NAME="134.75.115.33"
 
 # The location of this Identity provider; used for generating a self-signed certification
 SSL_CITYNAME="City"
@@ -99,6 +99,7 @@ KAFE_ATTR="array('uid','surname','givenName','displayName','mail','eduPersonAffi
 
 # add or not research and scholarship category
 KAFE_RS_CATEGORY=yes
+KAFE_EDUGAIN=yes
 
 # the name of federation; initially, all organizations have to join a test federation
 KAFE_FEDMETANAME="KAFE-testfed"

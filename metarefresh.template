@@ -59,6 +59,8 @@ $config = array(
 			 */
 			'outputFormat' => 'flatfile',
 		),
+		
+		# edugain
 	),
 );
 

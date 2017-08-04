@@ -2,8 +2,9 @@
 
 # installtion script for simplesamlphp IdP
 # jiny92@kisti.re.kr (KAFE federation) 2016/1/26
-# updated 2016/1/25 (v 0.10)
+# updated 2017/8/2 (v 0.11)
 # History
+# 0.11: minor fix. edugain
 
 source ./config.sh
 
@@ -94,15 +95,15 @@ VER=$(lsb_release -sr)
 
 if [ $OS == "CentOS" -a $ARCH == "64" ]
 then 
-	if [ $VER == "6.7" -o $VER == "6.8" ]; then
+	if [ $VER == "6.7" -o $VER == "6.8" -o $VER == "6.9" ]; then
 		echo "Ok. keep going"
 	else
-		echo "Opps. This script works for CentOS 6.7/6.8 (64-bit only)"
+		echo "Opps. This script works for CentOS 6.7/6.8/6.9 (64-bit only)"
 		exit 1
 
 	fi
 else
-	echo "Oops. not working on this Linux distribution. This script works for CentOS 6.7/6.8 (64-bit only)"
+	echo "Oops. not working on this Linux distribution. This script works for CentOS 6.7/6.8/6.9 (64-bit only)"
 	exit 1
 fi
 
@@ -183,5 +184,16 @@ fi
 sed -i "/'metadata.sources' => array(/a\ 	 array('type' => 'flatfile', 'directory' => 'metadata/$META_DIR')," "$SSP_PATH"config/config.php
 #delete next line
 sed -i "/* 'metadata.sources' => array(/{n;d}" "$SSP_PATH"config/config.php
+
+
+if [ $KAFE_EDUGAIN = "yes" ]; then
+	sed -i "/# edugain/r edugain.template" "$SSP_PATH"config/config-metarefresh.php
+	
+	mkdir -p "$SSP_PATH"metadata/metadata-edugain
+	chown apache.apache "$SSP_PATH"metadata/metadata-edugain
+	
+	sed -i "/array('type' => 'flatfile', 'directory' => 'metadata\/metadata-kafe-test')/a array('type' => 'flatfile', 'directory' => 'metadata/kafe-edugain')," "$SSP_PATH"config/config.php
+fi
+
 
 chcon -R -h -t httpd_sys_content_t "$SSP_PATH"config/
