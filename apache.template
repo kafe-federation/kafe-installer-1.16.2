@@ -1,5 +1,5 @@
 ## DO NOT MODIFY THIS LINE ##
-<Directory /var/simplesamlphp/>
+<Directory SSPPATHHERE/>
 	Options Indexes FollowSymLinks
 	AllowOverride None
 	Allow from all
@@ -7,7 +7,7 @@
 
 <VirtualHost *:80>
 	DocumentRoot /var/www/html
-	Alias /simplesaml /var/simplesamlphp/www
+	Alias /simplesaml SSPPATHHERE/www
 	ServerName SERVERNAMEHERE
 
 	RewriteEngine On
