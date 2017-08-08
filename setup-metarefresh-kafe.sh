@@ -2,8 +2,9 @@
 
 # installtion script for simplesamlphp IdP
 # jiny92@kisti.re.kr (KAFE federation) 2016/1/26
-# updated 2017/8/2 (v 0.11)
+# updated 2017/8/8 (v 0.12)
 # History
+# 0.12: handling multiple nic interfaces
 # 0.11: minor fix. edugain
 
 source ./config.sh
@@ -62,13 +63,12 @@ if grep -q "NXDOMAIN" <<< $TMP_ADDR; then
         fi
 fi
 
-if [[ "${HOST_ADDR[@]}" =~ "$TMP_ADDR" ]]; then
-        echo "ok. properly set the ip address of this machine"
+if echo ${HOST_ADDR[@]} | grep -q $TMP_ADDR; then
+         echo "ok. properly set the ip address of this machine"
 else
         echo "invalid SERVER_NAME. check your configuration"
         exit
 fi
-
 
 if grep -q $META_SCOPE <<< $MEMBER_ORGURL; then
         echo "META_SCOPE is within the scope"
