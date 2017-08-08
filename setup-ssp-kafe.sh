@@ -188,11 +188,10 @@ echo ""
 ##########################open firewall port#############################
 
 echo "[Firewall setup] it denies all incoming requests except for FIM-related ones."
-#read enter
 
-iptables-restore < ./iptables.template
+#iptables-restore < ./iptables.template
 
-iptables-save > /etc/sysconfig/iptables
+#iptables-save > /etc/sysconfig/iptables
 
 
 echo ""
