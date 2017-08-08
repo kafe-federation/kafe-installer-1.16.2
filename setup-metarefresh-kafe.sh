@@ -192,7 +192,7 @@ if [ $KAFE_EDUGAIN = "yes" ]; then
 	mkdir -p "$SSP_PATH"metadata/metadata-edugain
 	chown apache.apache "$SSP_PATH"metadata/metadata-edugain
 	
-	sed -i "/array('type' => 'flatfile', 'directory' => 'metadata\/metadata-kafe-test')/a array('type' => 'flatfile', 'directory' => 'metadata/kafe-edugain')," "$SSP_PATH"config/config.php
+	sed -i "/array('type' => 'flatfile', 'directory' => 'metadata\/metadata-kafe-test')/a array('type' => 'flatfile', 'directory' => 'metadata/metadata-edugain')," "$SSP_PATH"config/config.php
 fi
 
 
