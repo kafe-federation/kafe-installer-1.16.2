@@ -203,7 +203,7 @@ echo "[Package setup] it installs required software packages for simpleSAMLphp. 
 The packages include php-date, openssl, mysql, mysql-server, php-mysql, php-mcrypt."
 #read enter
 
-#yum -y install php httpd php-common php-pdo php-mbstring php-pear php-mysql php-gd php-date openssl mysql mysql-server mod_ssl php-xml
+yum -y install php httpd php-common php-pdo php-mbstring php-pear php-mysql php-gd php-date openssl mysql mysql-server mod_ssl php-xml
 
 if [ $BACKEND_DB = "ldap" ] 
 then
