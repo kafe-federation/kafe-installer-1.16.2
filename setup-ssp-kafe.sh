@@ -2,8 +2,9 @@
 
 # installtion script for simplesamlphp IdP
 # jiny92@kisti.re.kr (KAFE federation) 2016/1/19
-# updated 2017/08/04 (v 0.47)
+# updated 2017/08/24 (v 0.48)
 # History
+# 0.48: support ssp-1.14.15
 # 0.47: support entitycategories
 # 0.46: minor fix
 # 0.45: Put on KAFE theme
@@ -257,7 +258,7 @@ echo "[simpleSAMLphp installation] it downloads the latest simplesamlphp from si
 The package will be placed on ". $SSP_PATH ." run of this script will replace old SSP configuration."
 #read enter
 
-wget https://github.com/coreen-kafe/simplesamlphp-1.14.14/archive/master.zip
+wget https://github.com/coreen-kafe/simplesamlphp-1.14.15/archive/master.zip
 
 if [ -d $SSP_PATH ]; then
 	echo "existing simplesamlphp directory found. deleting"
