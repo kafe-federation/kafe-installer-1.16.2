@@ -1,4 +1,4 @@
-Bugs in simpleSAMLphp older than 1.14.14
+Bugs in simpleSAMLphp older than 1.14.15
 - if a single SP logout, instead of single logout(SLO), all SPs are forced to logout.
 
 Bugs in kafe_installer (fixed)

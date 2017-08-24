@@ -1,6 +1,6 @@
 # kafe-idp-installer-test
 
-For simpleSAMLphp 1.14.14
+For simpleSAMLphp 1.14.15
 
 * set up config.php
 * run setup-ssp-kafe.sh
