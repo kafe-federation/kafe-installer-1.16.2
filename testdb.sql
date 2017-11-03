@@ -11,5 +11,9 @@ create table ex_users(
 	affi	varchar(30)
 )default charset=utf8;
 
-insert into ex_users (username, password, name, email, affi) values('student', 'student1234', 'coreen', 'coreen@example.org', 'student');
-insert into ex_users (username, password, name, email, affi) values('st1', 'st1', 'coreen', 'coreen@example.org', '교수');
+insert into ex_users (username, password, name, email, affi) values('student1', 'student1234', '홍길동', 'coreen@example.org', 'student');
+insert into ex_users (username, password, name, email, affi) values('student2', 'student1234', 'Mary Kim', 'coreen@example.org', '교수');
+insert into ex_users (username, password, name, email, affi) values('student3', 'student1234', '선우용녀', 'coreen@example.org', '직원');
+insert into ex_users (username, password, name, email, affi) values('student4', 'student1234', '김숙', 'coreen@example.org', '대학원생');
+insert into ex_users (username, password, name, email, affi) values('student5', 'student1234', 'Sweet Hony Hyun', 'coreen@example.org', '대학원생');
+

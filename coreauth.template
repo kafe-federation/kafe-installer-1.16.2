@@ -10,6 +10,7 @@ class sspmod_YOURAUTHSOURCE_Auth_Source_CoreAuth extends sspmod_core_Auth_UserPa
 	private $password;
         private $eAffiliation;
         private $affiliationMap;
+        private $stopWords;
 
 	public function __construct($info, $config) { 
 
@@ -52,11 +53,56 @@ class sspmod_YOURAUTHSOURCE_Auth_Source_CoreAuth extends sspmod_core_Auth_UserPa
                         'faculty' => array('faculty','member'),
                         'alum' => array('alum'),
                 );
+		$this->stopWords = array(
+                        "황목",
+                        "황보",
+                        "남궁",
+                        "제갈",
+			"선우",
+                );
 	}
 
 	private function checkPassword($db_in_pw, $user_in_pw) {
 		return $user_in_pw === $db_in_pw;
 	}
+
+	private function separateName($name){
+            if(strlen($name) != mb_strlen($name, 'utf-8')) { //2-byte char
+            // 2 or 3 Korean chars naming
+                $name_chars = strlen($name);
+                if($name_chars == 6) {
+                        $surname = mb_strcut($name, 0, 3);
+                        if(in_array($surname, $this->stopWords)){
+                                $sn='';
+                                $gn='';
+                                }else{ // no stop word
+                                $sn = $surname;
+                                $gn = mb_strcut($name, 3, strlen($name) - 3);
+                                }
+                        }else{ // do not separate sn and givenName
+                                if($name_chars > 6) {
+                                        $snt = mb_strcut($name, 0, 6);
+                                        if(in_array($snt, $this->stopWords)){
+                                                $sn = mb_strcut($snt, 0, 6);
+                                                $gn = mb_strcut($name, 6, strlen($name) - 6);
+                                        }else{
+                                                $sn = mb_strcut($snt, 0, 3);
+                                                $gn = mb_strcut($name, 3, strlen($name) - 3);
+                                        }
+                                }
+                        }
+                }else{ //1-byte char
+                        $enm = explode(" ", $name);
+                        if( count($enm) > 1) {
+                                $gn = $enm[0];
+                                $sn = $enm[count($enm) -1 ];
+                        }else{
+                                $sn = '';
+                                $gn = '';
+                        }
+                }
+                return array("sn" => $sn, "gn" => $gn);
+        }
 
 	//ORACLE_START
 	/*
@@ -148,11 +194,19 @@ class sspmod_YOURAUTHSOURCE_Auth_Source_CoreAuth extends sspmod_core_Auth_UserPa
                         $this->eAffiliation = array('affiliate');
                 }
 		
+		$name = $this->separateName($row['name']);
+		$sn = array($name['sn']);
+		$givenname = array($name['gn']);
+
 		$epsAffiliation = array($this->eAffiliation['0']."@ATTR_SCOPED");		
 		$eppName = array(base64_encode(sha1($username))."@ATTR_SCOPED");
 
 	        /* Create the attribute array of the user. */
 		/*
+
+		$name = $this->separateName($displayName);
+	        $sn = array($name['sn']);
+		$givenName = array($name['gn']);
         	$attributes = array();
 	        $attributes['uid'] = array($username);
         	if(!empty($row['name'])) $attributes['displayName'] = array($row['name']);
@@ -168,6 +222,8 @@ class sspmod_YOURAUTHSOURCE_Auth_Source_CoreAuth extends sspmod_core_Auth_UserPa
 		$attributes = array(
 			'uid' => array($username),
 			'displayName' 		=> array($row['name']),
+			'sn'			=> $sn,
+			'givenName'		=> $givenname,
 			'mail'			=> array($row['email']),
 	                'eduPersonAffiliation' 	=> $this->eAffiliation,
 			'eduPersonPrincipalName' => $eppName,
