@@ -2,8 +2,9 @@
 
 # installtion script for simplesamlphp IdP
 # jiny92@kisti.re.kr (KAFE federation) 2016/1/19
-# updated 2017/08/24 (v 0.48)
+# updated 2017/11/03 (v 0.49)
 # History
+# 0.49: improve shib compatibility
 # 0.48: support ssp-1.14.15
 # 0.47: support entitycategories
 # 0.46: minor fix
@@ -204,7 +205,7 @@ echo "[Package setup] it installs required software packages for simpleSAMLphp. 
 The packages include php-date, openssl, mysql, mysql-server, php-mysql, php-mcrypt."
 #read enter
 
-yum -y install php httpd php-common php-pdo php-mbstring php-pear php-mysql php-gd php-date openssl mysql mysql-server mod_ssl php-xml
+yum -y install php httpd php-common php-pdo php-mcrypt php-mbstring php-pear php-mysql php-gd php-date openssl mysql mysql-server mod_ssl php-xml
 
 if [ $BACKEND_DB = "ldap" ] 
 then
@@ -386,7 +387,6 @@ sed -i 's/server.crt/kafe-member-idp.crt/g' $SSP_PATH/metadata/saml20-idp-hosted
 
 sed -i "/'auth' => 'example-userpass',/a\	'userid.attribute' => 'uid'," $SSP_PATH/metadata/saml20-idp-hosted.php 
 sed -i "s/'auth' => 'example-userpass'/'auth' => 'kafe-userpass'/g" $SSP_PATH/metadata/saml20-idp-hosted.php
-
 
 ############## configuring authentication source ###############
 echo "[Authentication-source setup] it enables you to login an Web-based service using a test user DB. \

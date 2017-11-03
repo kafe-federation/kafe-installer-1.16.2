@@ -145,11 +145,25 @@ class sspmod_YOURAUTHSOURCE_Auth_Source_CoreAuth extends sspmod_core_Auth_UserPa
       		if (array_key_exists($row['affi'], $this->affiliationMap)) {
                         $this->eAffiliation = $this->affiliationMap[$row['affi']];
                 } else {
-                        $this->eAffiliation = 'affiliate';
+                        $this->eAffiliation = array('affiliate');
                 }
 		
 		$epsAffiliation = array($this->eAffiliation['0']."@ATTR_SCOPED");		
 		$eppName = array(base64_encode(sha1($username))."@ATTR_SCOPED");
+
+	        /* Create the attribute array of the user. */
+		/*
+        	$attributes = array();
+	        $attributes['uid'] = array($username);
+        	if(!empty($row['name'])) $attributes['displayName'] = array($row['name']);
+	        if(!empty($row['email']))  $attributes['mail'] = array($row['email']);
+        	if(!empty($row['sn']))  $attributes['sn'] = array($row['sn']);
+	        if(!empty($row['givenname']))  $attributes['givenName'] = array($row['givenname']);
+	        if(!empty($row['affi']))  $attributes['eduPersonAffiliation'] = array($row['affi']);
+	        if(!empty($row['org']))  $attributes['organizationName'] = array($row['org']);
+	        if(!empty($row['schac']))  $attributes['schacHomeOrganization'] = array($row['schac']);
+		* use above instead of the below
+		*/		
 
 		$attributes = array(
 			'uid' => array($username),

@@ -12,7 +12,7 @@ SSP_ADMIN_MAIL=adminemail@yourorg.ac.kr
 SSP_ADMIN_PASS=yourpasswordhere
 
 # Path for simpleSAMLphp
-SSP_PATH="/var/simplesamlphp-new"
+SSP_PATH="/var/simplesamlphp"
 
 # This identity-provider server's IP address can be either a public or a private.
 # Currently, the available option is the public only.
@@ -52,7 +52,7 @@ ORACLE_FIELD_EPA=oracle_field_affiliation
 ## Apache configuration
 # The server name should be a domain name. KAFE rejects this identity provider if the 
 # server name is set to an IP address. An IP address would be okay only for testing purpose.
-SERVER_NAME="3.5.5.3"
+SERVER_NAME="134.75.115.33"
 
 # The location of this Identity provider; used for generating a self-signed certification
 SSL_CITYNAME="City"

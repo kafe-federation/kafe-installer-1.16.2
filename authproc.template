@@ -16,3 +16,4 @@
     	),
 
 	'assertion.encryption' => false,
+	'redirect.sign' => true,
