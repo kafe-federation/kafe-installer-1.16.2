@@ -1,6 +1,6 @@
 # kafe-idp-installer-test
 
-For simpleSAMLphp 1.14.15
+It probably works for the KAFE-version of simpleSAMLphp 1.14.15. Built IdP will follow the Technical Profile of KAFE Policy. 
 
 * set up config.php
 * run setup-ssp-kafe.sh
