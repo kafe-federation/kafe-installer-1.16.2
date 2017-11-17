@@ -2,8 +2,9 @@
 
 # installtion script for simplesamlphp IdP
 # jiny92@kisti.re.kr (KAFE federation) 2016/1/19
-# updated 2017/11/03 (v 0.49)
+# updated 2017/11/17 (v 0.50)
 # History
+# 0.50: add statistics module
 # 0.49: improve shib compatibility
 # 0.48: support ssp-1.14.15
 # 0.47: support entitycategories
@@ -497,6 +498,23 @@ mv $SSP_PATH/modules/consent-master $SSP_PATH/modules/consent
 rm -rf master.zip
 
 echo ""
+
+########################## configuring statistics module
+echo "[Consent setup] it converts the default statistics module into that of KAFE generated"
+
+if [ -d $SSP_PATH/modules/statistics ]; then
+        rm -rf $SSP_PATH/modules/statistics
+fi
+
+wget https://github.com/coreen-kafe/statistics/archive/master.zip
+unzip master.zip -d $SSP_PATH/modules
+mv $SSP_PATH/modules/statistics-master $SSP_PATH/modules/statistics
+
+rm -rf master.zip
+
+echo ""
+
+
 
 ########################## KAFE theme
 echo "[Theme setup] it overwrites a new KAFE theme. Make sure that your organizational BI(logo) should be placed in "$(pwd)"/images folder."
