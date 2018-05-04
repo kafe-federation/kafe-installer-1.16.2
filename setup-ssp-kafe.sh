@@ -2,8 +2,9 @@
 
 # installtion script for simplesamlphp IdP
 # jiny92@kisti.re.kr (KAFE federation) 2016/1/19
-# updated 2017/11/17 (v 0.50)
+# updated 2018/5/4 (v 0.51)
 # History
+# 0.51: add eduPersonEntitlement filter
 # 0.50: add statistics module
 # 0.49: improve shib compatibility
 # 0.48: support ssp-1.14.15
@@ -404,9 +405,16 @@ else
 fi
 
 mkdir -p $SSP_PATH/modules/kafe/lib/Auth/Source
+mkdir -p $SSP_PATH/modules/kafe/lib/Auth/Process
 touch $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+touch $SSP_PATH/modules/kafe/lib/Auth/Process/EntitlementFilter.php
+
 cp ./coreauth.template $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+cp ./entitlementfilter.template $SSP_PATH/modules/kafe/lib/Auth/Process/EntitlementFilter.php
+
 sed -i "s/YOURAUTHSOURCE/kafe/g" $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
+sed -i "s/YOURAUTHSOURCE/kafe/g" $SSP_PATH/modules/kafe/lib/Auth/Process/EntitlementFilter.php
+
 sed -i "s/ATTR_SCOPED/$ATTRIBUTE_EPSCOPEDAFFILIATION/g" $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
 sed -i "s/ATTR_ORGNAME/$ATTRIBUTE_ORGNAME/g" $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
 sed -i "s/ATTR_SCHACHOME/$ATTRIBUTE_SCHACHOMEORG/g" $SSP_PATH/modules/kafe/lib/Auth/Source/CoreAuth.php
@@ -453,7 +461,7 @@ fi
 if grep "88 => array('class' => 'core:AttributeMap'," $SSP_PATH/config/config.php > /dev/null; then
 	echo "found existing name2oid setup. skip configuration"
 else
-	sed -i -e "/50 => 'core:AttributeLimit',/r nameoid.template" $SSP_PATH/config/config.php
+	sed -i -e "/50 => 'core:AttributeLimit',/r config.template" $SSP_PATH/config/config.php
 fi
 
 if grep "OrganizationName" $SSP_PATH/metadata/saml20-idp-hosted.php > /dev/null; then

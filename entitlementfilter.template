@@ -1,0 +1,69 @@
+<?php
+
+/**
+ * Filter to add eduPersonEntitlement attribute.
+ *
+ */
+class sspmod_YOURAUTHSOURCE_Auth_Process_EntitlementFilter extends SimpleSAML_Auth_ProcessingFilter {
+	/**
+	 * SP's entityID to an entitlement string.
+	 */
+	private $entitlements = array();
+
+	private $entitleattribute = array(
+		'oid'  => 'urn:oid:1.3.6.1.4.1.5923.1.1.1.7',
+		'name' => 'eduPersonEntitlement',
+	);
+
+	/**
+	 * Initialize this filter.
+	 *
+	 * @param array $config  Configuration information about this filter.
+	 * @param mixed $reserved  For future use.
+	 */
+	public function __construct($config, $reserved) {
+		parent::__construct($config, $reserved);
+
+		assert('is_array($config)');
+		if(isset($config['entitle'])) {
+			$this->entitlements = $config['entitle'];
+		} 
+		
+	}
+
+	/**
+	 * Apply filter to add or remove edupersonentitlement attribute.
+	 *
+	 * Add or replace existing attributes with the configured values.
+	 *
+	 * @param array &$request  The current request
+	 */
+	public function process(&$request) {
+		assert('is_array($request)');
+		assert('array_key_exists("Attributes", $request)');
+
+		$attributes =& $request['Attributes'];
+		$spentityid = $request['SPMetadata']['entityid'];
+	        $entitlevalues = array();
+
+                if(array_key_exists($spentityid, $this->entitlements)) {
+                        $entitlevalues = $this->entitlements[$spentityid];
+                }
+
+                /*
+                 * enfoce to remove existing eduPersonEntitlement
+                 * replace the old to new one
+                 */
+                if(!empty($entitlevalues)) {
+                    if(array_key_exists($this->entitleattribute['oid'], $attributes)){
+                        unset($attributes[$this->entitleattribute['oid']]);
+                        $attributes[$this->entitleattribute['oid']] = $entitlevalues;
+                    }else if(array_key_exists($this->entitleattribute['name'], $attributes)){
+                        unset($attributes[$this->entitleattribute['name']]);
+                        $attributes[$this->entitleattribute['name']] = $entitlevalues;
+                    }
+                }
+
+	}
+
+}

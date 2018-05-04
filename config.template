@@ -1,0 +1,28 @@
+        /*
+         * SP's entityID to an entitlement string
+         * it forces to embed the entitlement value to attributes
+         */
+	/*
+        60 => array(
+            'class'  => 'kafe:EntitlementFilter',
+            'entitle' => array(
+                'https://testssp.kreonet.net/sp/simplesamlphp' => array( 'test-entitle-values:1234'),
+                'https://myhome.creonet.ac.kr/sp/shibboleth' => array('test-entitle-values:9999'),
+            ),
+        ),
+	*/
+
+        88 => array('class' => 'core:AttributeMap',
+             'oid2name',
+        ),
+        90 => array(
+            'class' => 'consent:Consent',
+            'store' => 'consent:Cookie',
+            'focus' => 'yes',
+            'checked' => TRUE,
+	    'useRegistrationAuthority' => TRUE,
+	    'useLogo' => FALSE,
+        ),
+        91 => array('class' => 'core:AttributeMap',
+              'name2oid',
+        ),
