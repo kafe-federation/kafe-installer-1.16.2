@@ -2,8 +2,9 @@
 
 # installtion script for simplesamlphp IdP
 # jiny92@kisti.re.kr (KAFE federation) 2016/1/19
-# updated 2018/5/4 (v 0.51)
+# updated 2018/5/17 (v 0.52)
 # History
+# 0.52: add AUP-related stuff to carry SIRTFI
 # 0.51: add eduPersonEntitlement filter
 # 0.50: add statistics module
 # 0.49: improve shib compatibility
@@ -528,6 +529,7 @@ echo ""
 echo "[Theme setup] it overwrites a new KAFE theme. Make sure that your organizational BI(logo) should be placed in "$(pwd)"/images folder."
 
 sed -i "s|https://www.your.org|$MEMBER_IDPURL|g" $SSP_PATH/modules/kafe/themes/coreen/core/loginuserpass.php
+sed -i "s|MAIN_ADMIN|$SSP_ADMIN_MAIL|g"  $SSP_PATH/modules/kafe/themes/coreen/core/loginuserpass.php
 
 if [ -f ./images/$MEMBER_ORGIMG ]; then
 	sed -i "s|images/kreonet_logo.gif|images/$MEMBER_ORGIMG|g" $SSP_PATH/modules/kafe/themes/coreen/core/loginuserpass.php
