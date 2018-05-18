@@ -322,7 +322,7 @@ fi
 echo 	"updating apache configuration."
 sed -i -e "/#<\/VirtualHost>/r apache.template" /etc/httpd/conf/httpd.conf
 sed -i "s/SERVERNAMEHERE/$SERVER_NAME/g" /etc/httpd/conf/httpd.conf
-sed -i "s/SSPPATHHERE/$SSP_PATH/g" /etc/httpd/conf/httpd.conf
+sed -i "s|SSPPATHHERE|$SSP_PATH|g" /etc/httpd/conf/httpd.conf
 
 sed -i "s|SSLCertificateFile /etc/pki/tls/certs/localhost.crt|SSLCertificateFile /etc/pki/tls/certs/ca.crt|g" /etc/httpd/conf.d/ssl.conf
 sed -i "s|SSLCertificateKeyFile /etc/pki/tls/private/localhost.key|SSLCertificateKeyFile /etc/pki/tls/private/ca.key|g" /etc/httpd/conf.d/ssl.conf
@@ -529,7 +529,9 @@ echo ""
 echo "[Theme setup] it overwrites a new KAFE theme. Make sure that your organizational BI(logo) should be placed in "$(pwd)"/images folder."
 
 sed -i "s|https://www.your.org|$MEMBER_IDPURL|g" $SSP_PATH/modules/kafe/themes/coreen/core/loginuserpass.php
+sed -i "s|https://www.your.org|$MEMBER_IDPURL|g" $SSP_PATH/templates/includes/footer-coreen.php
 sed -i "s|MAIN_ADMIN|$SSP_ADMIN_MAIL|g"  $SSP_PATH/modules/kafe/themes/coreen/core/loginuserpass.php
+
 
 if [ -f ./images/$MEMBER_ORGIMG ]; then
 	sed -i "s|images/kreonet_logo.gif|images/$MEMBER_ORGIMG|g" $SSP_PATH/modules/kafe/themes/coreen/core/loginuserpass.php
