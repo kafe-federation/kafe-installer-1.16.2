@@ -528,8 +528,8 @@ echo ""
 ########################## KAFE theme
 echo "[Theme setup] it overwrites a new KAFE theme. Make sure that your organizational BI(logo) should be placed in "$(pwd)"/images folder."
 
-sed -i "s|https://www.your.org|$MEMBER_IDPURL|g" $SSP_PATH/modules/kafe/themes/coreen/core/loginuserpass.php
-sed -i "s|https://www.your.org|$MEMBER_IDPURL|g" $SSP_PATH/templates/includes/footer-coreen.php
+sed -i "s|https://www.your.org|${MEMBER_IDPURL%/*}|g" $SSP_PATH/modules/kafe/themes/coreen/core/loginuserpass.php
+sed -i "s|https://www.your.org|${MEMBER_IDPURL%/*}|g" $SSP_PATH/templates/includes/footer-coreen.php
 sed -i "s|MAIN_ADMIN|$SSP_ADMIN_MAIL|g"  $SSP_PATH/modules/kafe/themes/coreen/core/loginuserpass.php
 
 
