@@ -193,6 +193,12 @@ class sspmod_YOURAUTHSOURCE_Auth_Source_CoreAuth extends sspmod_core_Auth_UserPa
                 } else {
                         $this->eAffiliation = array('affiliate');
                 }
+
+                //if no priviledge
+                if (in_array('alum', $this->eAffiliation)) {
+                        SimpleSAML_Logger::warning('KafeAuth: the user ' . var_export($username, TRUE) . ' has no privilege.');
+                        throw new SimpleSAML_Error_Error('NOPRIVILEGE');
+                }
 		
 		$name = $this->separateName($row['name']);
 		$sn = array($name['sn']);
@@ -203,7 +209,6 @@ class sspmod_YOURAUTHSOURCE_Auth_Source_CoreAuth extends sspmod_core_Auth_UserPa
 
 	        /* Create the attribute array of the user. */
 		/*
-
 		$name = $this->separateName($displayName);
 	        $sn = array($name['sn']);
 		$givenName = array($name['gn']);
