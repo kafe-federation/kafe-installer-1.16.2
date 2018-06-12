@@ -46,9 +46,16 @@ class sspmod_YOURAUTHSOURCE_Auth_Process_EntitlementFilter extends SimpleSAML_Au
 		$spentityid = $request['SPMetadata']['entityid'];
 	        $entitlevalues = array();
 
-                if(array_key_exists($spentityid, $this->entitlements)) {
-                        $entitlevalues = $this->entitlements[$spentityid];
-                }
+
+		/*
+  		 * coreauth: a user with 'member' affiliation can have the eduPersonEntitlement attribute.
+		 * if he/she has the ePE attribute, can replace existing ePE
+		 */
+		if(array_key_exists($this->entitleattribute['oid'], $attributes) || array_key_exists($this->entitleattribute['name'], $attributes)){
+			if(array_key_exists($spentityid, $this->entitlements)) {
+                        	$entitlevalues = $this->entitlements[$spentityid];
+                	}	
+                }else return;
 
                 /*
                  * enfoce to remove existing eduPersonEntitlement
