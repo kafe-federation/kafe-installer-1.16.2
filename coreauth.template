@@ -241,6 +241,14 @@ class sspmod_YOURAUTHSOURCE_Auth_Source_CoreAuth extends sspmod_core_Auth_UserPa
 
 		if (!in_array('member', $attributes['eduPersonAffiliation'])) unset($attributes['eduPersonEntitlement']);
 
+                foreach($attributes as $key=>$value) {
+                    foreach($value as $k=>$v) {
+                        if($v =="") unset($value[$k]);
+                    }
+                    if(is_null($value) || empty($value)) unset($attributes[$key]);
+                }
+
+
 		return $attributes;		
 	}
 }
