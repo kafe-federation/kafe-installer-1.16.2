@@ -4,6 +4,22 @@ default_keyfile = key.pem # name of generated keys
 default_md = md5 # message digest algorithm
 string_mask = nombstr # permitted characters
 distinguished_name = req_distinguished_name
+x509_extensions = v3_ca
+req_extensions = v3_req
+x509_extensions = usr_cert
+
+[ usr_cert ]
+basicConstraints=CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth, clientAuth, codeSigning, emailProtection
+nsComment = "OpenSSL Generated Certificate"
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid, issuer
+
+[ v3_req ]
+extendedKeyUsage = serverAuth, clientAuth, codeSigning, emailProtection
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
 
 [ req_distinguished_name ]
 # Variable name   Prompt string

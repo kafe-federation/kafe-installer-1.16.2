@@ -17,7 +17,12 @@
         ),
         90 => array(
             'class' => 'consent:Consent',
-            'store' => 'consent:Cookie',
+            'store' => array(
+		'consent:Database',
+		'dsn' => 'mysql:host=localhost;dbname=consent',
+		'username' => 'DBUSER',
+		'password' => 'DBPASS',
+	     ),
             'focus' => 'yes',
             'checked' => TRUE,
 	    'useRegistrationAuthority' => TRUE,

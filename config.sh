@@ -26,8 +26,7 @@ BACKEND_DB="sql"
 # be "root".
 SQL_DB_NAME=user_db_test
 SQL_DB_USER=root
-SQL_DB_PASS=yourdbpasswordhere
-
+SQL_DB_PASS=dbpass
 
 ########################## skip from here ############################
 # for Oracle DB
@@ -52,7 +51,7 @@ ORACLE_FIELD_EPA=oracle_field_affiliation
 ## Apache configuration
 # The server name should be a domain name. KAFE rejects this identity provider if the 
 # server name is set to an IP address. An IP address would be okay only for testing purpose.
-SERVER_NAME="1.5.1.1"
+SERVER_NAME="134.75.115.21"
 
 # The location of this Identity provider; used for generating a self-signed certification
 SSL_CITYNAME="City"

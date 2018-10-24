@@ -5,10 +5,15 @@
 	Allow from all
 </Directory>
 
-<VirtualHost *:80>
+<VirtualHost *>
 	DocumentRoot /var/www/html
 	Alias /simplesaml SSPPATHHERE/www
 	ServerName SERVERNAMEHERE
+        SetEnv SIMPLESAMLPHP_CONFIG_DIR /var/simplesamlphp/config
+
+	<Directory SSPPATHHERE/www>
+             Require all granted
+        </Directory>
 
 	RewriteEngine On
 	RewriteCond %{HTTPS} !on

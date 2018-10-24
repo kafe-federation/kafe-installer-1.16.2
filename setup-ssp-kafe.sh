@@ -1,47 +1,9 @@
 #!/bin/sh
 
 # installtion script for simplesamlphp IdP
-# jiny92@kisti.re.kr (KAFE federation) 2016/1/19
-# updated 2018/5/17 (v 0.52)
+# jiny92@kisti.re.kr (KAFE federation) 2018/10/1
+# updated 2018/10/12 (v 0.12)
 # History
-# 0.52: add AUP-related stuff to carry SIRTFI
-# 0.51: add eduPersonEntitlement filter
-# 0.50: add statistics module
-# 0.49: improve shib compatibility
-# 0.48: support ssp-1.14.15
-# 0.47: support entitycategories
-# 0.46: minor fix
-# 0.45: Put on KAFE theme
-# 0.44: SHA256 signature
-# 0.43: SSP download from KAFE github(bug-fix, read registration authority)
-# 0.42: logrotate configuration
-# 0.41: Bug fixed(Refer im.kreonet.net/wiki)
-# 0.40: NameIDFormat <-- transient, SSP 1.14.14
-# 0.39: centos 6.9 support
-# 0.38: ssp 1.14.2 enabled (tsoc)
-# 0.37: consent updated
-# 0.36: LDAP configuration script
-# 0.35: LDAP how-to
-# 0.34: bug fixed, port open for LDAP/LDAPS
-# 0.33: bug fixed
-# 0.32: NameID format, HTTP-Redirect/-POST binding
-# 0.31: no assertion encryption by default
-# 0.31: eduPersonEntitlement
-# 0.30: eduPersonScopedAffiliation
-# 0.29: bug fixed (signature algorithm --> sha256)
-# 0.28: bug fixed
-# 0.27: affiliation mapping(eduPersonAffiliation)
-# 0.26: Template generation for Oracle DB
-# 0.25: NAT configuration
-# 0.24: add new ogranizational logo
-# 0.23: Bug fixed. validation check
-# 0.22: Bug fixed. validate MEMBER_IDPURL
-# 0.21: HTTPS configuration, default SP(https://testssp.kreonet.net) metadata installation
-# 0.20: host ip validation
-# 0.19: bug fixed (iptables)
-# 0.18: configuration files are merged into one
-# 0.17: http to https redirection
-#
 
 source ./config.sh
 
@@ -134,22 +96,23 @@ if ! [ -f /usr/bin/wget ]; then
 	yum -y install wget
 fi
 
+
 OS=$(lsb_release -si)
 ARCH=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/')
-VER=$(lsb_release -sr)
+VER_STR=$(lsb_release -sr)
+VER=$(echo $VER_STR | head -c 1)
 
 if [ $OS == "CentOS" -a $ARCH == "64" ]; then 
-   if [ $VER == "6.7" -o $VER == "6.8" -o $VER == "6.9" ]; then 
+   if [ $VER -ge 7 ]; then 
 	echo "Ok. keep going"
    else
-	echo "This script works for CentOS 6.7/6.8 (64-bit only)"
+	echo "This script works for CentOS 7 and above (64-bit only)"
 	exit 1
    fi
 else
-  	echo "Oops. not working on this Linux distribution. This script works for CentOS 6.7/6.8/6.9 (64-bit) only"
+  	echo "Oops. not working on this Linux distribution. This script works for CentOS 7 and above (64-bit) only"
 	exit 1
 fi
-
 
 
 echo "[Update CentOS]"
@@ -164,7 +127,6 @@ echo ""
 
 #echo 0 > /selinux/enforce
 #sed -i 's/enforcing/disabled/g' /etc/selinux/config
-
 
 #echo ""
 ########################## enabling ntp ################################
@@ -195,9 +157,9 @@ echo ""
 echo "[Firewall setup] it denies all incoming requests except for FIM-related ones."
 
 #iptables-restore < ./iptables.template
-
 #iptables-save > /etc/sysconfig/iptables
 
+systemctl stop firewalld
 
 echo ""
 
@@ -220,25 +182,26 @@ fi
 
 PHP_VER=$(php -v|grep --only-matching --perl-regexp "5\.\\d+\.\\d+")
 
-rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+rpm -ivh https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-11.noarch.rpm
 yum -y update
 yum -y install php-mcrypt 
 yum -y install php-mysql
 
-service mysqld start
-chkconfig mysqld on
+systemctl enable mysqld
+systemctl start mysqld
 
+rpm -ivh http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm
 
 echo "removing previous mysql server installation"
-service mysqld stop && yum remove -y mysql mysql-server && rm -rf /var/lib/mysql && rm -rf /var/log/mysqld.log && rm -rf /etc/my.cnf
-yum install -y mysql mysql-server
+systemctl stop mysqld && yum remove -y mysql mysql-server && rm -rf /var/lib/mysql && rm -rf /var/log/mysqld.log && rm -rf /etc/my.cnf
+yum install -y mysql-server
 
 if [ ! -f /etc/my.cnf ]
 then
 	cp ./mycnf.template /etc/my.cnf
 fi
 
-service mysqld start
+systemctl start mysqld
 TEMPROOTDBPASS="`grep 'temporary.*root@localhost' /var/log/mysqld.log | tail -n 1 | sed 's/.*root@localhost: //'`"
 
 mysqladmin -u root --password="$TEMPROOTDBPASS" password "$SQL_DB_PASS"
@@ -253,19 +216,27 @@ mysql -u root --password="$SQL_DB_PASS" <<-EOSQL
 EOSQL
 
 if test -d "/var/lib/mysql/user_db_test"; then
-        echo "database exists. skip installing DB"
+        echo "database exists. skip configuring DB"
 else
         mysql -u$SQL_DB_USER -p$SQL_DB_PASS < testdb.sql
 fi
 
+if test -d "/var/lib/mysql/consent"; then
+	echo "consent database exists. skip configuring DB"
+else
+	mysql -u$SQL_DB_USER -p$SQL_DB_PASS < consent.sql
+fi
+
 echo ""
+
 
 ################### downloading simplesamlphp #########################
 echo "[simpleSAMLphp installation] it downloads the latest simplesamlphp from simplesamlphp.org. \
 The package will be placed on ". $SSP_PATH ." run of this script will replace old SSP configuration."
 #read enter
 
-wget https://github.com/coreen-kafe/simplesamlphp-1.14.15/archive/master.zip
+#wget https://github.com/coreen-kafe/simplesamlphp-1.16.2/archive/master.zip
+wget https://github.com/kafe-federation/simplesamlphp-kafe/archive/kafe-1.16.2.zip -O master.zip
 
 if [ -d $SSP_PATH ]; then
 	echo "existing simplesamlphp directory found. deleting"
@@ -282,7 +253,7 @@ mkdir -p $SSP_PATH && mv simplesamlphp-*/ simplesamlphp && cp -r simplesamlphp/*
 rm -rf simplesamlphp
 
 # 보안 컨텍스트 변경
-chcon -R -h -t httpd_sys_content_t $SSP_PATH
+#chcon -R -h -t httpd_sys_content_t $SSP_PATH
 
 echo ""
 
@@ -291,7 +262,6 @@ echo ""
 echo "[Apache setup] it configs Apache web server. Make sure that it skips HTTPS setup. \
 You have to enable HTTPS by userself."
 #read enter
-
 
 cp ssl.template ssl.cnf
 
@@ -306,13 +276,7 @@ openssl req -new -x509 -nodes -days 365 -key ca.key -out ca.crt -config ssl.cnf 
 
 cp ca.crt /etc/pki/tls/certs
 cp ca.key /etc/pki/tls/private/ca.key
-#cp ca.csr /etc/pki/tls/private/ca.csr
 
-if grep "LoadModule ssl_module modules/mod_ssl.so" /etc/httpd/conf/httpd.conf > /dev/null; then
-        echo "found existing ssl_module. skip configuration"
-else
-        sed -i -e "/LoadModule mime_module modules\/mod_mime.so/a\LoadModule ssl_module modules\/mod_ssl.so" /etc/httpd/conf/httpd.conf
-fi
 
 if grep "## DO NOT MODIFY THIS LINE ##" /etc/httpd/conf/httpd.conf > /dev/null; then
         echo "found existing apache configuration. deleting the old one."
@@ -320,29 +284,30 @@ if grep "## DO NOT MODIFY THIS LINE ##" /etc/httpd/conf/httpd.conf > /dev/null; 
 fi
 
 echo 	"updating apache configuration."
-sed -i -e "/#<\/VirtualHost>/r apache.template" /etc/httpd/conf/httpd.conf
+
+if grep "Alias /simplesaml" /etc/httpd/conf.d/ssl.conf > /dev/null; then
+	echo "existing ssl.conf found. skip configuring"
+else
+	echo "adding new one"
+	sed -i -e "/#<\/VirtualHost>/r apache-ssl.template" /etc/httpd/conf.d/ssl.conf
+	sed -i "s|SSPPATHHERE|$SSP_PATH|g" /etc/httpd/conf.d/ssl.conf
+fi
+
+cat apache.template >> /etc/httpd/conf/httpd.conf
 sed -i "s/SERVERNAMEHERE/$SERVER_NAME/g" /etc/httpd/conf/httpd.conf
 sed -i "s|SSPPATHHERE|$SSP_PATH|g" /etc/httpd/conf/httpd.conf
 
 sed -i "s|SSLCertificateFile /etc/pki/tls/certs/localhost.crt|SSLCertificateFile /etc/pki/tls/certs/ca.crt|g" /etc/httpd/conf.d/ssl.conf
 sed -i "s|SSLCertificateKeyFile /etc/pki/tls/private/localhost.key|SSLCertificateKeyFile /etc/pki/tls/private/ca.key|g" /etc/httpd/conf.d/ssl.conf
 
-if grep "Alias /simplesaml" /etc/httpd/conf.d/ssl.conf > /dev/null; then
-	echo "existing ssl.conf configuration found. skip"
-else	
-	echo "adding new one"
-	sed -i "s|</VirtualHost>|Alias /simplesaml $SSP_PATH/www\n&|" /etc/httpd/conf.d/ssl.conf
-fi
-
 rm -rf ./ca.*
 
 # 보안 컨텍스트 복원
-restorecon -RvF /etc/pki/
+#restorecon -RvF /etc/pki/
 
-service httpd restart
+systemctl restart httpd
 
 echo ""
-
 
 ################### configure SSP ##############################
 echo "[simpleSAMLphp setup] it updates config/config.php (saltkey, timezone, admin password, contact, etc). "
@@ -362,6 +327,7 @@ fi
 
 echo ""
 
+
 ############## installing self-signed certificate ##############
 
 echo "[SSL certificate] it installs a self-signed certificate for simpleSAMLphp. you MUST NOT use any commercial certificate except for HTTPS."
@@ -376,14 +342,16 @@ if [ -f ./kafe-member-idp.crt ]; then
 fi
 
 if ! [ -f $SSP_PATH/cert/kafe-member-idp.crt ]; then
-	openssl req -newkey rsa:2048 -new -x509 -sha256 -days 3652 -nodes -out kafe-member-idp.crt -keyout kafe-member-idp.pem -config ssl.cnf -batch
+	openssl req -newkey rsa:4096 -new -x509 -sha256 -days 3652 -nodes -out kafe-member-idp.crt -keyout kafe-member-idp.pem -config ssl.cnf -batch
 	mv ./kafe-member-idp.* $SSP_PATH/cert
 fi
 
 # 보안 컨텍스트 변경
-chcon -R -h -t cert_t $SSP_PATH/cert/
+#chcon -R -h -t cert_t $SSP_PATH/cert/
 
 echo ""
+
+rm -rf ssl.cnf
 
 ################### configuring idp metadata ###################
 echo "[Metadata setup] it registers cert-info into IdP's metadata."
@@ -394,9 +362,10 @@ sed -i 's/server.crt/kafe-member-idp.crt/g' $SSP_PATH/metadata/saml20-idp-hosted
 sed -i "/'auth' => 'example-userpass',/a\	'userid.attribute' => 'uid'," $SSP_PATH/metadata/saml20-idp-hosted.php 
 sed -i "s/'auth' => 'example-userpass'/'auth' => 'kafe-userpass'/g" $SSP_PATH/metadata/saml20-idp-hosted.php
 
+
 ############## configuring authentication source ###############
 echo "[Authentication-source setup] it enables you to login an Web-based service using a test user DB. \
-Make sure that you have to make further configuration to enable users to login with your organizational user DB."
+Make sure that you have to make more configuration to enable users to login with your organizational user DB."
 
 if grep kafe-userpass $SSP_PATH/config/authsources.php > /dev/null; then
         echo "[Warning] you must delete 'kafe-userpass' array in authsources.php if you want to make this configuration work [Enter]"
@@ -463,6 +432,8 @@ if grep "88 => array('class' => 'core:AttributeMap'," $SSP_PATH/config/config.ph
 	echo "found existing name2oid setup. skip configuration"
 else
 	sed -i -e "/50 => 'core:AttributeLimit',/r config.template" $SSP_PATH/config/config.php
+	sed -i -e "s/DBUSER/$SQL_DB_USER/g" $SSP_PATH/config/config.php
+	sed -i -e "s/DBPASS/$SQL_DB_PASS/g" $SSP_PATH/config/config.php
 fi
 
 if grep "OrganizationName" $SSP_PATH/metadata/saml20-idp-hosted.php > /dev/null; then
@@ -476,20 +447,14 @@ sed -i "s/MYORGDISPLAYNAME/$MEMBER_ORGDISPLAY/g" $SSP_PATH/metadata/saml20-idp-h
 sed -i "s|MYORGURL|$MEMBER_ORGURL|g" $SSP_PATH/metadata/saml20-idp-hosted.php
 
 sed -i "s/'metadata.sign.enable' => false,/'metadata.sign.enable' => true,/g" $SSP_PATH/config/config.php
+sed -i "s/'metadata.sign.algorithm' => null,/'metadata.sign.algorithm' => 'http:\/\/www.w3.org\/2001\/04\/xmldsig-more#rsa-sha256',/g" $SSP_PATH/config/config.php
+
 
 if grep "logouttype" $SSP_PATH/metadata/saml20-idp-hosted.php > /dev/null; then
 	echo "found existing logout type. skip configuration"
 else
 	sed -i "/'host' => '__DEFAULT__',/a\  	'logouttype' => 'iframe'," $SSP_PATH/metadata/saml20-idp-hosted.php
 fi
-
-echo ""
-
-
-########################## updating attribute-map file
-echo "[Setup AttributeMap] now updating addribute map (name2oid and oid2name)"
-cp ./name2oid.template $SSP_PATH/attributemap/name2oid.php 
-cp ./oid2name.template $SSP_PATH/attributemap/oid2name.php
 
 echo ""
 
@@ -506,6 +471,18 @@ mv $SSP_PATH/modules/consent-master $SSP_PATH/modules/consent
 
 rm -rf master.zip
 
+touch $SSP_PATH/modules/consentAdmin/enable
+cp $SSP_PATH/modules/consentAdmin/config-templates/*.php $SSP_PATH/config
+
+POSTFIX="simplesaml"
+REDIRECT_URL=$MEMBER_IDPURL$POSTFIX
+
+sed -i "s/DBHOST/localhost/g" $SSP_PATH/config/module_consentAdmin.php
+sed -i "s/DBNAME/consent/g" $SSP_PATH/config/module_consentAdmin.php
+sed -i "s/USERNAME/$SQL_DB_USER/g" $SSP_PATH/config/module_consentAdmin.php
+sed -i "s/PASSWORD/$SQL_DB_PASS/g" $SSP_PATH/config/module_consentAdmin.php
+sed -i "s|http:\/\/www.wayf.dk|$REDIRECT_URL|g" $SSP_PATH/config/module_consentAdmin.php
+sed -i "s/'authority' => 'saml2'/'authority' => 'kafe-userpass'/g" $SSP_PATH/config/module_consentAdmin.php
 echo ""
 
 ########################## configuring statistics module
