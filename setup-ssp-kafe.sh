@@ -236,7 +236,7 @@ The package will be placed on ". $SSP_PATH ." run of this script will replace ol
 #read enter
 
 #wget https://github.com/coreen-kafe/simplesamlphp-1.16.2/archive/master.zip
-wget https://github.com/kafe-federation/simplesamlphp-kafe/archive/kafe-1.16.2.zip -O master.zip
+wget https://github.com/kafe-federation/simplesamlphp-kafe/archive/kafe-1.16.2-1.zip -O master.zip
 
 if [ -d $SSP_PATH ]; then
 	echo "existing simplesamlphp directory found. deleting"

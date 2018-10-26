@@ -9,7 +9,7 @@ SSP_ADMIN_NAME=Administrator
 SSP_ADMIN_MAIL=adminemail@yourorg.ac.kr
 
 # Password of the administrator; the password is used for simpleSAMLphp Web login
-SSP_ADMIN_PASS=yourpasswordhere
+SSP_ADMIN_PASS=adminpass
 
 # Path for simpleSAMLphp
 SSP_PATH="/var/simplesamlphp"
